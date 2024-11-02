@@ -1,0 +1,14 @@
+Step 1.
+A feature descriptor-----Gabor features
+
+
+Step 2.
+A learning method ---- SVM 
+
+Step 3.
+Testing the classification
+Testing the classification
+
+
+
+Step 4.
