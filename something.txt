@@ -1,9 +1,10 @@
 Step 1.
 A feature descriptor---
 a high-dimensional descriptor--- one feature each
-.karen
-.nicole
-.ravi
+
+.nicole --- dimentionally reduction techinque and knn
+.karen---- gabor and NN
+.ravi---- full imgae an svm
 
 
 Step 2.
