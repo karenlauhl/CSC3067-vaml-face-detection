@@ -1,13 +1,20 @@
 Step 1.
-A feature descriptor-----Gabor features
+A feature descriptor---
+a high-dimensional descriptor--- one feature each
+.karen
+.nicole
+.ravi
 
 
 Step 2.
-A learning method ---- SVM 
+A learning method ---- 
+ NN or choose ur classifiers. each on of us.
+
+
 
 Step 3.
 Testing the classification
-Testing the classification
+Cross validation
 
 
 
