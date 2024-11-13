@@ -9,7 +9,6 @@ scales = [1, 0.9, 0.8, 0.7];  % Different scales to detect faces of various size
 
 % Loop through each full image
 for img_index = 1:length(full_image_files)
-    % Load the full image (assuming it is already grayscale)
     full_image = imread(full_image_files{img_index});
     
     % Loop through each step size
