@@ -11,10 +11,27 @@ allLabels=[trainLabels; testLabels];  % ; does it vertical.
 % Train the classifier
 model = trainModel(trainImages, trainLabels);
 
+%% Evaluation
 % Evaluate the model on the test set
-accuracy = evaluateModel(model, testImages, testLabels);
+[labels, classificationResult] = evaluateModel(model, testImages, testLabels);
+comparison = (labels==classificationResult);
+Accuracy = sum(comparison)/length(comparison)
 
+% Type 1 and Type 2 error
+TP= sum ((labels==classificationResult) & (labels==1))
+TN= sum ((labels==classificationResult) & (labels==-1))
+FP= sum ((labels~=classificationResult) & (labels==-1))
+FN= sum ((labels~=classificationResult) & (labels==1))
 
+% Metrics
+Precision = TP / (TP+FP)
+Recall = TP / (TP+FN)
+Specificity = TN / (TN+FP)
+Sensitivity = TP / (TP+FN)
+Fmeasure= 2 * TP / (2 * TP+FN+FP)
+False_alarm_rate = 1 - Specificity
+
+%% Detection
 % Load the image file
 imageFilePath = 'im3.jpg'; % Replace with your actual image file path
 groupImage = imread(imageFilePath);
