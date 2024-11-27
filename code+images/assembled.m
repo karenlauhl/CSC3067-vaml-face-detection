@@ -8,30 +8,61 @@
 %allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
 %allLabels=[trainLabels; testLabels];  % ; does it vertical.
 
-%Nntesting -------------------------
-modelNN = NNtraining(trainImages, trainLabels);
+
+%
+% Initialize matrix to store HOG features for all training images
+numImages = size(trainImages, 1); % Number of images in the dataset
+hogtrainMatrix = zeros(numImages, length(hog_feature_vector(reshape(trainImages(1, :), 27, 18)))); % Preallocate
+% Loop through each image in the training set
+for i = 1:numImages
+    % Reshape each image from vector to 2D matrix
+    imgt = reshape(trainImages(i, :), [27, 18]);
+    % Extract HOG features for the current image
+    hogtrainMatrix(i, :) = hog_feature_vector(imgt); % Store HOG features in the matrix
+end
+
+% Check the size of the HOG matrix (each row corresponds to a feature vector for one image)
+disp(size(hogtrainMatrix));
+
+% Initialize matrix for HOG features of test images
+numTestImages = size(testImages, 1);
+testHogMatrix = zeros(numTestImages, size(hogtrainMatrix, 2)); % Preallocate
+% Loop through the test images and extract HOG features
+for i = 1:numTestImages
+    % Reshape the test image to 2D
+    testImg = reshape(testImages(i, :), [27, 18]);
+    % Extract HOG features for the test image
+    testHogMatrix(i, :) = hog_feature_vector(testImg); % Store HOG features
+end
+disp(size(testHogMatrix));
+%________________________________________________________________________
+
+%Nn-------------------------
+modelNN = NNtraining(hogtrainMatrix, trainLabels);
 
 for i=1:size(testImages,1)
-    testnumber= testImages(i,:);
+    testnumber= testHogMatrix(i,:);
     classificationResult(i,1) = NNTesting(testnumber, modelNN);
 end 
 
 % Evaluate accuracy
 accuracy_nn = sum(testLabels==classificationResult) / numel(testLabels);
 fprintf('Test Accuracy NN: %.2f%%\n', accuracy_nn * 100);
+%_________________________________________________________________________
 
-
-%KNntesting -------------------------
-modelKNN = KNNtraining(trainImages, trainLabels);
+%KNn-------------------------
+modelKNN = KNNtraining(hogtrainMatrix, trainLabels);
 
 for i=1:size(testImages,1)
-    testnumber= testImages(i,:);
+    testnumber= testHogMatrix(i,:);
     classificationResult(i,1) = KNNTesting(testnumber, modelKNN,11);
 end 
 
 % Evaluate accuracy
 accuracyKnn = sum(testLabels==classificationResult) / numel(testLabels);
 fprintf('Test Accuracy KNN: %.2f%%\n', accuracyKnn * 100);
+%_________________________________________________________________________
+
 
 
 
