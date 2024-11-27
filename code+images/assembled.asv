@@ -1,16 +1,18 @@
 % Main workflow script for face detection
+%% Training
 
 % Load training and test data
 % there is total 670= 45*4 + 49*10 in train as calculated
 [trainImages, trainLabels] = loadFaceImages('face_train.cdataset');   
-
+[testImages, testLabels] = loadFaceImages('face_test.cdataset');
 
 allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
 allLabels=[trainLabels; testLabels];  % ; does it vertical.
 
 % Train the classifier
 model = trainModel(trainImages, trainLabels);
-%% Evaluation
+
+%% Testing and Evaluation
 % Evaluate the model on the test set
 [labels, classificationResult] = evaluateModel(model, testImages, testLabels);
 comparison = (labels==classificationResult);
@@ -65,20 +67,3 @@ finalDetections = slidingWindowFaceDetection(groupImage, model, windowSize, step
 % % Evaluate accuracy
 % accuracy = sum(predictedLabels == testLabels) / numel(testLabels);
 % fprintf('Test Accuracy: %.2f%%\n', accuracy * 100);
-
-
-
-% Finally we compared the predicted classification from our mahcine
-% learning algorithm against the real labelling of the esting image
-if featOn
-    
-
-else
-    comparison = (labels==classificationResultImages);
-end
-
-%Accuracy is the most common metric. It is defiend as the numebr of
-%correctly classified samples/ the total number of tested samples
-
-
-

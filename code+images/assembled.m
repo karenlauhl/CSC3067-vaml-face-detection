@@ -1,4 +1,5 @@
 % Main workflow script for face detection
+%% Training
 
 % Load training and test data
 % there is total 670= 45*4 + 49*10 in train as calculated
@@ -11,7 +12,7 @@ allLabels=[trainLabels; testLabels];  % ; does it vertical.
 % Train the classifier
 model = trainModel(trainImages, trainLabels);
 
-%% Evaluation
+%% Testing and Evaluation
 % Evaluate the model on the test set
 [labels, classificationResult] = evaluateModel(model, testImages, testLabels);
 comparison = (labels==classificationResult);
