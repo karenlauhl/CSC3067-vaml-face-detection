@@ -6,23 +6,36 @@
 [trainImages, trainLabels] = loadFaceImages('face_train.cdataset');   
 [testImages, testLabels] = loadFaceImages('face_test.cdataset');
 
-allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
-allLabels=[trainLabels; testLabels];  % ; does it vertical.
+%allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
+%allLabels=[trainLabels; testLabels];  % ; does it vertical.
 
-% Train the classifier
-model = trainModel(trainImages, trainLabels);
+%NN Model Training
+[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(trainImages);
+modelNN = NNtraining(Xpca, trainLabels);
 
-%% Testing and Evaluation
+%% NN Testing
 % Evaluate the model on the test set
-[labels, classificationResult] = evaluateModel(model, testImages, testLabels);
-comparison = (labels==classificationResult);
-Accuracy = sum(comparison)/length(comparison)
+for i=1:size(testImages,1)
+    testnumber= testImages(i,:);
+    testpca = (testnumber - meanX) * eigenVectors;
+    classificationResult(i,1) = NNTesting(testpca, modelNN);
+end 
+%% Evaluation
 
+% Finally we compared the predicted classification from our mahcine
+% learning algorithm against the real labelling of the testing image
+comparison = (testLabels==classificationResult);
+
+%Accuracy is the most common metric. It is defiend as the numebr of
+%correctly classified samples/ the total number of tested samples
+AccuracyNN = sum(comparison)/length(comparison)
+
+% Evaluate accuracy
 % Type 1 and Type 2 error
-TP= sum ((labels==classificationResult) & (labels==1))
-TN= sum ((labels==classificationResult) & (labels==-1))
-FP= sum ((labels~=classificationResult) & (labels==-1))
-FN= sum ((labels~=classificationResult) & (labels==1))
+TP= sum ((testLabels==classificationResult) & (testLabels==1))
+TN= sum ((testLabels==classificationResult) & (testLabels==-1))
+FP= sum ((testLabels~=classificationResult) & (testLabels==-1))
+FN= sum ((testLabels~=classificationResult) & (testLabels==1))
 
 % Metrics
 Precision = TP / (TP+FP)
@@ -32,20 +45,71 @@ Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
-%% Detection
-% Load the image file
-imageFilePath = 'im3.jpg'; % Replace with your actual image file path
-groupImage = imread(imageFilePath);
+%% KNN Testing 
+[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(trainImages);
+modelKNN = KNNtraining(Xpca, trainLabels);
 
-% Define parameters
-windowSize = [27, 18];
-stepSize = 7;
-scales = [1,0.7]; % Example scale levels for the image pyramid   ,0.9, 0.8, 0.7, 0.6
-iouThreshold=0.1;
+for i=1:size(testImages,1)
+    testnumber= testImages(i,:);
+    testpca = (testnumber - meanX) * eigenVectors;
+    classificationResult(i,1) = KNNTesting(testpca, modelKNN,11);
+end 
 
-%Run sliding window face detection
-finalDetections = slidingWindowFaceDetection(groupImage, model, windowSize, stepSize, scales,iouThreshold);
+%% Evaluation
 
+% Finally we compared the predicted classification from our mahcine
+% learning algorithm against the real labelling of the testing image
+comparison = (testLabels==classificationResult);
+
+%Accuracy is the most common metric. It is defiend as the numebr of
+%correctly classified samples/ the total number of tested samples
+AccuracyKNN = sum(comparison)/length(comparison)
+
+% Evaluate accuracy
+% Type 1 and Type 2 error
+TP= sum ((testLabels==classificationResult) & (testLabels==1))
+TN= sum ((testLabels==classificationResult) & (testLabels==-1))
+FP= sum ((testLabels~=classificationResult) & (testLabels==-1))
+FN= sum ((testLabels~=classificationResult) & (testLabels==1))
+
+% Metrics
+Precision = TP / (TP+FP)
+Recall = TP / (TP+FN)
+Specificity = TN / (TN+FP)
+Sensitivity = TP / (TP+FN)
+Fmeasure= 2 * TP / (2 * TP+FN+FP)
+False_alarm_rate = 1 - Specificity
+
+
+
+
+
+
+
+
+
+
+
+% % Train the classifier
+% model = trainModel(trainImages, trainLabels);
+% 
+% % Evaluate the model on the test set
+% accuracy = evaluateModel(model, testImages, testLabels);
+% 
+% 
+% % Load the image file
+% imageFilePath = 'im3.jpg'; % Replace with your actual image file path
+% groupImage = imread(imageFilePath);
+% 
+% % Define parameters
+% windowSize = [27, 18];
+% stepSize = 7;
+% scales = [1,0.7]; % Example scale levels for the image pyramid   ,0.9, 0.8, 0.7, 0.6
+% iouThreshold=0.1;
+% 
+% %Run sliding window face detection
+% finalDetections = slidingWindowFaceDetection(groupImage, model, windowSize, stepSize, scales,iouThreshold);
+% 
 
 
 

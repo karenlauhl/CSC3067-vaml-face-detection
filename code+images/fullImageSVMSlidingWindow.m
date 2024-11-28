@@ -1,4 +1,7 @@
-% Step 1: Load a List of Full Images
+[train_images, train_labels] = loadFaceImages('face_train.cdataset');
+[test_images, test_labels] = loadFaceImages('face_test.cdataset');
+model = SVMtraining(train_images, train_labels);
+
 % List of full images for detection
 full_image_files = {'im1.jpg', 'im2.jpg', 'im3.jpg', 'im4.jpg'};
 

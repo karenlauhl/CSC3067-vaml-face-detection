@@ -1,8 +1,12 @@
-function modelNN = NNtraining(images, labels)
-    % Normalize the images (e.g., scale to [0, 1])
-    images = images ./ max(images(:));
-    
-    % Store training data in the model
-    modelNN.neighbours = images;
-    modelNN.labels = labels;
+function [modelNN, eigenVectors, eigenvalues, meanX, Xpca] = NNtraining(images, labels)
+
+modelNN.neighbours=images;
+modelNN.labels=labels;
+
+%gaborFeaturesTrain = arrayfun(@(i) gabor_feature_vector(reshape(images(i, :), [27, 18])), 1:size(images, 1), 'UniformOutput', false);
+%trainFeatures = cell2mat(gaborFeaturesTrain');
+
+%modelNN.gabor_feature=trainFeatures;
+
+
 end
