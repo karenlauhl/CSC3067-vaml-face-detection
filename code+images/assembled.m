@@ -1,15 +1,11 @@
 % Main workflow script for face detection
+%% Training
 
 % Load training and test data
 % there is total 670= 45*4 + 49*10 in train as calculated
 [trainImages, trainLabels] = loadFaceImages('face_train.cdataset');   
 [testImages, testLabels] = loadFaceImages('face_test.cdataset');
 
-%allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
-%allLabels=[trainLabels; testLabels];  % ; does it vertical.
-
-
-%
 % Initialize matrix to store HOG features for all training images
 numImages = size(trainImages, 1); % Number of images in the dataset
 hogtrainMatrix = zeros(numImages, length(hog_feature_vector(reshape(trainImages(1, :), 27, 18)))); % Preallocate
@@ -35,36 +31,89 @@ for i = 1:numTestImages
     testHogMatrix(i, :) = hog_feature_vector(testImg); % Store HOG features
 end
 disp(size(testHogMatrix));
-%________________________________________________________________________
 
-%Nn-------------------------
-modelNN = NNtraining(hogtrainMatrix, trainLabels);
+%allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
+%allLabels=[trainLabels; testLabels];  % ; does it vertical.
 
-for i=1:size(testImages,1)
-    testnumber= testHogMatrix(i,:);
-    classificationResult(i,1) = NNTesting(testnumber, modelNN);
-end 
 
-% Evaluate accuracy
-accuracy_nn = sum(testLabels==classificationResult) / numel(testLabels);
-fprintf('Test Accuracy NN: %.2f%%\n', accuracy_nn * 100);
-%_________________________________________________________________________
+%% NN Model Training
+[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
+modelNN = NNtraining(Xpca, trainLabels);
+%modelNN = NNtraining(hogtrainMatrix, trainLabels);
 
-%KNn-------------------------
-modelKNN = KNNtraining(hogtrainMatrix, trainLabels);
+%% NN Testing
 
 for i=1:size(testImages,1)
     testnumber= testHogMatrix(i,:);
-    classificationResult(i,1) = KNNTesting(testnumber, modelKNN,11);
-end 
+    testpca = (testnumber - meanX) * eigenVectors;
+    classificationResult(i,1) = NNTesting(testpca, modelNN);
+end
+
+%% Evaluation
+
+% Finally we compared the predicted classification from our mahcine
+% learning algorithm against the real labelling of the testing image
+comparison = (testLabels==classificationResult);
+
+%Accuracy is the most common metric. It is defiend as the numebr of
+%correctly classified samples/ the total number of tested samples
+AccuracyNN = sum(comparison)/length(comparison)
 
 % Evaluate accuracy
-accuracyKnn = sum(testLabels==classificationResult) / numel(testLabels);
-fprintf('Test Accuracy KNN: %.2f%%\n', accuracyKnn * 100);
-%_________________________________________________________________________
+% Type 1 and Type 2 error
+TP= sum ((testLabels==classificationResult) & (testLabels==1))
+TN= sum ((testLabels==classificationResult) & (testLabels==-1))
+FP= sum ((testLabels~=classificationResult) & (testLabels==-1))
+FN= sum ((testLabels~=classificationResult) & (testLabels==1))
+
+% Metrics
+Precision = TP / (TP+FP)
+Recall = TP / (TP+FN)
+Specificity = TN / (TN+FP)
+Sensitivity = TP / (TP+FN)
+Fmeasure= 2 * TP / (2 * TP+FN+FP)
+False_alarm_rate = 1 - Specificity
+
+%% KNN Testing 
+[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
+modelKNN = KNNtraining(Xpca, trainLabels);
+
+for i=1:size(testImages,1)
+    testnumber= testHogMatrix(i,:);
+    testpca = (testnumber - meanX) * eigenVectors;
+    classificationResult(i,1) = KNNTesting(testpca, modelKNN,11);
+end
+
+%% Evaluation
+
+% Finally we compared the predicted classification from our mahcine
+% learning algorithm against the real labelling of the testing image
+comparison = (testLabels==classificationResult);
+
+%Accuracy is the most common metric. It is defiend as the numebr of
+%correctly classified samples/ the total number of tested samples
+AccuracyKNN = sum(comparison)/length(comparison)
+
+% Evaluate accuracy
+% Type 1 and Type 2 error
+TP= sum ((testLabels==classificationResult) & (testLabels==1))
+TN= sum ((testLabels==classificationResult) & (testLabels==-1))
+FP= sum ((testLabels~=classificationResult) & (testLabels==-1))
+FN= sum ((testLabels~=classificationResult) & (testLabels==1))
+
+% Metrics
+Precision = TP / (TP+FP)
+Recall = TP / (TP+FN)
+Specificity = TN / (TN+FP)
+Sensitivity = TP / (TP+FN)
+Fmeasure= 2 * TP / (2 * TP+FN+FP)
+False_alarm_rate = 1 - Specificity
+
+%% Notes
 
 
 
+% WE NEED TO ADD DETECTOR 
 
 
 

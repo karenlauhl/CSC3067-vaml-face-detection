@@ -1,12 +1,12 @@
-function modelNN = NNtraining(images, labels)
+function [modelNN, eigenVectors, eigenvalues, meanX, Xpca] = NNtraining(images, labels)
 
 modelNN.neighbours=images;
 modelNN.labels=labels;
 
-gaborFeaturesTrain = arrayfun(@(i) gabor_feature_vector(reshape(images(i, :), [27, 18])), 1:size(images, 1), 'UniformOutput', false);
-trainFeatures = cell2mat(gaborFeaturesTrain');
+%gaborFeaturesTrain = arrayfun(@(i) gabor_feature_vector(reshape(images(i, :), [27, 18])), 1:size(images, 1), 'UniformOutput', false);
+%trainFeatures = cell2mat(gaborFeaturesTrain');
 
-modelNN.gabor_feature=trainFeatures;
+%modelNN.gabor_feature=trainFeatures;
 
 
 end
