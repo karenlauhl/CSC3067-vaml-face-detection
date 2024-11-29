@@ -6,20 +6,49 @@
 [trainImages, trainLabels] = loadFaceImages('face_train.cdataset');   
 [testImages, testLabels] = loadFaceImages('face_test.cdataset');
 
+% Initialize matrix to store HOG features for all training images
+numImages = size(trainImages, 1); % Number of images in the dataset
+hogtrainMatrix = zeros(numImages, length(hog_feature_vector(reshape(trainImages(1, :), 27, 18)))); % Preallocate
+% Loop through each image in the training set
+for i = 1:numImages
+    % Reshape each image from vector to 2D matrix
+    imgt = reshape(trainImages(i, :), [27, 18]);
+    % Extract HOG features for the current image
+    hogtrainMatrix(i, :) = hog_feature_vector(imgt); % Store HOG features in the matrix
+end
+
+% Check the size of the HOG matrix (each row corresponds to a feature vector for one image)
+disp(size(hogtrainMatrix));
+
+% Initialize matrix for HOG features of test images
+numTestImages = size(testImages, 1);
+testHogMatrix = zeros(numTestImages, size(hogtrainMatrix, 2)); % Preallocate
+% Loop through the test images and extract HOG features
+for i = 1:numTestImages
+    % Reshape the test image to 2D
+    testImg = reshape(testImages(i, :), [27, 18]);
+    % Extract HOG features for the test image
+    testHogMatrix(i, :) = hog_feature_vector(testImg); % Store HOG features
+end
+disp(size(testHogMatrix));
+
 %allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
 %allLabels=[trainLabels; testLabels];  % ; does it vertical.
 
-%NN Model Training
-[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(trainImages);
+
+%% NN Model Training
+[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
 modelNN = NNtraining(Xpca, trainLabels);
+%modelNN = NNtraining(hogtrainMatrix, trainLabels);
 
 %% NN Testing
-% Evaluate the model on the test set
+
 for i=1:size(testImages,1)
-    testnumber= testImages(i,:);
+    testnumber= testHogMatrix(i,:);
     testpca = (testnumber - meanX) * eigenVectors;
     classificationResult(i,1) = NNTesting(testpca, modelNN);
-end 
+end
+
 %% Evaluation
 
 % Finally we compared the predicted classification from our mahcine
@@ -46,14 +75,14 @@ Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
 %% KNN Testing 
-[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(trainImages);
+[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
 modelKNN = KNNtraining(Xpca, trainLabels);
 
 for i=1:size(testImages,1)
-    testnumber= testImages(i,:);
+    testnumber= testHogMatrix(i,:);
     testpca = (testnumber - meanX) * eigenVectors;
     classificationResult(i,1) = KNNTesting(testpca, modelKNN,11);
-end 
+end
 
 %% Evaluation
 
@@ -80,8 +109,11 @@ Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
+%% Notes
 
 
+
+% WE NEED TO ADD DETECTOR 
 
 
 
