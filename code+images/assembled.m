@@ -40,7 +40,6 @@ disp(size(testHogMatrix));
 
 %% NN Model Training
 modelNN = NNtraining(Xpca, trainLabels);
-%modelNN = NNtraining(hogtrainMatrix, trainLabels);
 
 %% NN Testing
 
