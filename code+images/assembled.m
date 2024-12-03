@@ -146,7 +146,6 @@ Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
-
 %% Notes
 
 
