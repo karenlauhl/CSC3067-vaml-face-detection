@@ -47,7 +47,7 @@ for im=1:sampling:numberOfImages
             images= [images; vector];
             labels= [labels; label];
             
-            Itemp =circshift(I,1)
+            Itemp =circshift(I,1);
             vector = reshape(Itemp,1, size(I, 1) * size(I, 2));
             vector = double(vector); % / 255;
             images= [images; vector];
@@ -71,7 +71,7 @@ for im=1:sampling:numberOfImages
             images= [images; vector];
             labels= [labels; label];
             
-            Itemp =circshift(fliplr(I),1)
+            Itemp =circshift(fliplr(I),1);
             vector = reshape(Itemp,1, size(I, 1) * size(I, 2));
             vector = double(vector); % / 255;
             images= [images; vector];
