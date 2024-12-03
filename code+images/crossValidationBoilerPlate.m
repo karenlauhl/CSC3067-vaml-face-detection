@@ -49,7 +49,7 @@ windowSize = [27, 18];
 stepSize = 7;
 scales = [1, 0.7]; % 0.9, 0.8, 0.7, 0.6
 iouThreshold = 0.1;
-imageFilePath = ['im1.jpg']; % Image for sliding window
+imageFilePath = 'im1.jpg'; % Image for sliding window
 groupImage = imread(imageFilePath);
 
 fprintf('Performing %d-Fold Cross-Validation...\n', numFolds);
@@ -59,8 +59,9 @@ fprintf('Performing %d-Fold Cross-Validation...\n', numFolds);
 %% Cross-validation loop
 for fold = 1:numFolds
     % Get training and test indices
-    trainIdx = setdiff(indices, testIdx);
     testIdx = folds{fold};
+    trainIdx = setdiff(indices, testIdx);
+    
 
     % Split data into training and testing sets
     XTrain = images(trainIdx, :);

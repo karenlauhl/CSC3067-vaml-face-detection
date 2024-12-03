@@ -15,15 +15,20 @@ function [detections, outputImage] = slidingWindowFaceDetection(image, model, wi
                 % Extract the window
                 window = resizedImg(y:y+windowSize(1)-1, x:x+windowSize(2)-1);
 
-                % Compute Gabor feature vector for this window
-                XFeatures = gabor_feature_vector(window);
+                % Flatten window to raw pixel values
+                XFeatures = double(window(:))'; % Convert to a row vector of pixel intensities
 
-                 % Predict using the trained neural network model
-                % Neural networks return outputs as probabilities (e.g., 0 for no face, 1 for face)
-                output = model(XFeatures');
-                [~, predictedLabel] = max(output);  % Get class with highest probability
-                 
-                   
+                % Ensure XFeatures matches the model's expected feature dimension
+                expectedDim = size(model.X, 2); % Number of features used during training
+                if length(XFeatures) < expectedDim
+                    XFeatures = [XFeatures, zeros(1, expectedDim - length(XFeatures))];
+                elseif length(XFeatures) > expectedDim
+                    XFeatures = XFeatures(1:expectedDim);
+                end
+
+                % Predict using the trained model
+                [predictedLabel, ~] = predict(model, XFeatures);
+
                 % If a face is detected, store the coordinates, width, height, and scale
                 if (predictedLabel == 1)
                     % Store as [x, y, width, height, scale]
