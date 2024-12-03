@@ -1,4 +1,4 @@
-function detection = simpleNMS(detection, threshold)
+function detection = applyNMS(detection, threshold)
 % simpleNMS: Perform non-maxima suppression to remove overlapping bounding boxes
 % 
 % Inputs:
