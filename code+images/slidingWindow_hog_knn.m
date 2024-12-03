@@ -1,25 +1,33 @@
-function [detections, outputImage] = slidingWindow_hog_knn(image, model)
+function [detections] = slidingWindow_hog_knn(fullImageFiles, model)
     % Define parameters
     windowSize = [27, 18];
-    stepSize = 3;
-    scales = [1]; % Fixed scale value as per your request
+    stepSize = 7;
+    scales = [1,0.9, 0.8, 0.7]; % Fixed scale value as per your request
+
+
+ for imgIndex = 1:length(fullImageFiles)
+    % Load the full image
+    fullImage = imread(fullImageFiles{imgIndex});
+    figure;
+    imshow(fullImage);
+    hold on;
+    title(['Detections for(HOG & KNN) ', fullImageFiles{imgIndex}]);
 
     % Initialize variables for storing detections
     detections = [];
-    outputImage = image; % Copy of the image for visualization
 
     % Loop over each scale in the image pyramid
     for scale = scales
         % Resize the image based on current scale
-        resizedImg = imresize(image, scale);
-        [height, width] = size(resizedImg);
+        resizedImg = imresize(fullImage, scale);
+        [rows, cols] = size(resizedImg);
 
         % Sliding window over the scaled image
-        for x = 1:stepSize:(width - windowSize(2) + 1)
-            for y = 1:stepSize:(height - windowSize(1) + 1)
+        for row = 1:stepSize:(rows - windowSize(1) + 1)
+            for col = 1:stepSize:(cols - windowSize(2) + 1)
                 % Extract the window
-                window_mat = resizedImg(y:y+windowSize(1)-1, x:x+windowSize(2)-1);
-                window_mat = reshape(window_mat,1, 27*18); 
+                window_mat = resizedImg(row:(row + windowSize(1) - 1), col:(col + windowSize(2) - 1));
+                window_mat = reshape(window_mat,1, []); 
                 % Normalize first do in after loading dataset
                 window_mat = double(window_mat);
                 window_mat = window_mat / 255;
@@ -30,12 +38,19 @@ function [detections, outputImage] = slidingWindow_hog_knn(image, model)
                 hogFeatures = hog_feature_vector(window_mat);
 
                 % Use KNN to classify the extracted features
-                predictedLabel = KNNTesting(hogFeatures, model, 11);
+                predictedLabel = KNNTesting(hogFeatures, model,11);
                 
                 % If a face is detected (predictedLabel == 1), store the detection
                 if predictedLabel == 1
-                    % Store as [x, y, width, height, scale]
-                    detections = [detections; x, y, windowSize(2), windowSize(1), scale];
+                   % Convert coordinates to original scale
+                    originalRow = round(row / scale);
+                    originalCol = round(col / scale);
+                    originalHeight = round(windowSize(1) / scale);
+                    originalWidth = round(windowSize(2) / scale);
+
+                    % Append detection
+                    detections = [detections; originalCol, originalRow, originalWidth, originalHeight, 1]; % Confidence = 1
+
                 end
             end
         end
@@ -45,26 +60,17 @@ function [detections, outputImage] = slidingWindow_hog_knn(image, model)
     fprintf('Total number of detections before NMS: %d\n', size(detections, 1));
     
     % Apply Non-Maximum Suppression (NMS) to reduce false positives
-    detections = applyNMS(detections, 0.6);
+    detections = applyNMS(detections, 0.3);
 
-    % Visualize the detections by drawing rectangles on the original image
-    figure;
-    imshow(outputImage); hold on;
+    % Draw final bounding boxes
     for i = 1:size(detections, 1)
-        x = detections(i, 1);
-        y = detections(i, 2);
-        width = detections(i, 3);
-        height = detections(i, 4);
-        scale = detections(i, 5);
-
-        % Scale the window size back to original image coordinates
-        rectPosition = [x / scale, y / scale, width / scale, height / scale];
-
-        % Draw rectangle
-        rectangle('Position', rectPosition, 'EdgeColor', 'r', 'LineWidth', 1.5);
+        rectangle('Position', detections(i, 1:4), 'EdgeColor', 'r', 'LineWidth', 2);
     end
     hold off;
 
     % Print the total number of detections after NMS
     fprintf('Total number of detections: %d\n', size(detections, 1));
+ end
+
+
 end
