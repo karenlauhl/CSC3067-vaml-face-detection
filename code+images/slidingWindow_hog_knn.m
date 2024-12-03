@@ -18,13 +18,16 @@ function [detections, outputImage] = slidingWindow_hog_knn(image, model)
         for x = 1:stepSize:(width - windowSize(2) + 1)
             for y = 1:stepSize:(height - windowSize(1) + 1)
                 % Extract the window
-                window = resizedImg(y:y+windowSize(1)-1, x:x+windowSize(2)-1);
-
+                window_mat = resizedImg(y:y+windowSize(1)-1, x:x+windowSize(2)-1);
+                window_mat = reshape(window_mat,1, 27*18); 
+                % Normalize first do in after loading dataset
+                window_mat = double(window_mat);
+                window_mat = window_mat / 255;
                 % Reshape the window to a 2D image for feature extraction
-                window = reshape(window, [27, 18]); % Reshape to match expected size
-
+                window_mat = reshape(window_mat, 27, 18); 
+                 
                 % Extract HOG features
-                hogFeatures = hog_feature_vector(window);
+                hogFeatures = hog_feature_vector(window_mat);
 
                 % Use KNN to classify the extracted features
                 predictedLabel = KNNTesting(hogFeatures, model, 11);
