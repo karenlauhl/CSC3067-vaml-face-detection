@@ -7,8 +7,8 @@ full_image_files = {'im1.jpg', 'im2.jpg', 'im3.jpg', 'im4.jpg'};
 
 % Sliding window parameters
 window_size = [27, 18];   % Set window size to match the training image size (27x18)
-step_sizes = [4, 8, 12];  % Different step sizes to test
-scales = [1, 0.9, 0.8, 0.7];  % Different scales to detect faces of various sizes
+step_sizes = [8];  % Different step sizes to test
+scales = [1, 0.9];  % Different scales to detect faces of various sizes
 
 % Loop through each full image
 for img_index = 1:length(full_image_files)
@@ -62,3 +62,29 @@ for img_index = 1:length(full_image_files)
         pause(1); % Pause to observe the detections before moving to the next step size
     end
 end
+
+%% Evaluation
+disp('Evaluating SVM Model:')
+
+% Finally we compared the predicted classification from our mahcine
+% learning algorithm against the real labelling of the testing image
+comparison = (testLabels==classificationResult);
+
+%Accuracy is the most common metric. It is defiend as the numebr of
+%correctly classified samples/ the total number of tested samples
+Accuracy = sum(comparison)/length(comparison)
+
+% Evaluate accuracy
+% Type 1 and Type 2 error
+TP= sum ((testLabels==classificationResult) & (testLabels==1))
+TN= sum ((testLabels==classificationResult) & (testLabels==-1))
+FP= sum ((testLabels~=classificationResult) & (testLabels==-1))
+FN= sum ((testLabels~=classificationResult) & (testLabels==1))
+
+% Metrics
+Precision = TP / (TP+FP)
+Recall = TP / (TP+FN)
+Specificity = TN / (TN+FP)
+Sensitivity = TP / (TP+FN)
+Fmeasure= 2 * TP / (2 * TP+FN+FP)
+False_alarm_rate = 1 - Specificity

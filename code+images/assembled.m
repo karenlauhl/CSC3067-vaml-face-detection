@@ -6,6 +6,7 @@
 [trainImages, trainLabels] = loadFaceImages('face_train.cdataset');   
 [testImages, testLabels] = loadFaceImages('face_test.cdataset');
 
+%% HOG
 % Initialize matrix to store HOG features for all training images
 numImages = size(trainImages, 1); % Number of images in the dataset
 hogtrainMatrix = zeros(numImages, length(hog_feature_vector(reshape(trainImages(1, :), 27, 18)))); % Preallocate
@@ -35,7 +36,7 @@ disp(size(testHogMatrix));
 %allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
 %allLabels=[trainLabels; testLabels];  % ; does it vertical.
 
-% Apply PCA
+%% Apply PCA
 [eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
 
 %% NN Model Training
