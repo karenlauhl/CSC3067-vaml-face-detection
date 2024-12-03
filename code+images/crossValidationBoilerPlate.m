@@ -55,11 +55,6 @@ groupImage = imread(imageFilePath);
 
 fprintf('Performing %d-Fold Cross-Validation...\n', numFolds);
 
-
-
-% Initialize metrics
-totalTP = 0; totalTN = 0; totalFP = 0; totalFN = 0;
-
 % Cross-validation loop
 for fold = 1:numFolds
     % Get test and train indices
