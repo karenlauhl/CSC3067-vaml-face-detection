@@ -1,13 +1,14 @@
 %% Training
 % Main script for cross-validation with multiple classifiers
-addpath("./SVM-KM")
+addpath("SVM-KM")
 
 % Load all data from all.cdataset
 [images, labels] = loadFaceImages("all.cdataset");
 
-model1NN = NNtraining(images, labels);
-modelKNN = KNNtraining(images, labels);
-modelSVM = SVMtraining(images, labels); % change this to SVM, 1-NN, k-NN, RF, or NN
+[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(images);
+model1NN = NNtraining(Xpca, labels);
+modelKNN = KNNtraining(Xpca, labels);
+modelSVM = SVMtraining(Xpca, labels); % change this to SVM, 1-NN, k-NN, RF, or NN
 % modelRF = RFtraining(images, labels); 
 % modelNN = NNtraining(images, labels);
 
@@ -59,15 +60,27 @@ fprintf('Performing %d-Fold Cross-Validation...\n', numFolds);
 %% Cross-validation loop
 for fold = 1:numFolds
     % Get training and test indices
+<<<<<<< HEAD
     testIdx = folds{fold};
     trainIdx = setdiff(indices, testIdx);
     
+=======
+<<<<<<< HEAD
+    trainIdx = training(cv, fold);
+    testIdx = test(cv, fold);
+    testpca = (testIdx - meanX) * eigenVectors;
+   
+=======
+    trainIdx = setdiff(indices, testIdx);
+    testIdx = folds{fold};
+>>>>>>> 53c53f82d9263d1698ab4280edbb78804ae812a2
+>>>>>>> 0d493fc6b03c1e9e1562fa0be6149c316361d5a2
 
     % Split data into training and testing sets
     XTrain = images(trainIdx, :);
     YTrain = labels(trainIdx);
-    XTest = images(testIdx, :);
-    YTest = labels(testIdx);
+    XTest = images(testpca, :);
+    YTest = labels(testpca);
 
     
     % Train and evaluate 1-NN
