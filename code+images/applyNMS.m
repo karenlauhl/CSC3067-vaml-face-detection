@@ -1,57 +1,47 @@
-% Function to apply Non-Maximum Suppression
-function filteredDetections = applyNMS(detections, iouThreshold)
-    if isempty(detections)
-        filteredDetections = [];
-        return;
-    end
+function detection = simpleNMS(detection, threshold)
+% simpleNMS: Perform non-maxima suppression to remove overlapping bounding boxes
+% 
+% Inputs:
+%   Objects: A matrix where each row represents a detected bounding box [x, y, width, height, confidence]
+%   threshold: The intersection-over-union (IoU) threshold for suppression
+%
+% Output:
+%   Objects: The remaining bounding boxes after suppression
 
-    % Initialize an empty array for the final boxes
-    filteredDetections = [];
-    % Sort detections by their confidence (here assumed to be the scale)
-    [~, idx] = sort(detections(:, 5), 'descend');
-    detections = detections(idx, :);  % Sort detections by scale (confidence)
+% Number of detected objects
+numObjects = size(detection, 1);
 
-    while ~isempty(detections)
-        % Take the top detection (highest score)
-        topDetection = detections(1, :);
-        filteredDetections = [filteredDetections; topDetection];
-        
-        % Remove the top detection from the list
-        detections(1, :) = [];
-        
-        % Compute IoU for remaining boxes and suppress those with high overlap
-        iou = computeIoU(topDetection, detections);
-        detections(iou > iouThreshold, :) = [];
+% Create a vector to store which objects to keep
+keep = true(numObjects, 1);
+
+for i = 1:numObjects
+    if keep(i) % Only process if this box has not already been removed
+        for j = i+1:numObjects
+            if keep(j) % Only process if the other box hasn't been removed
+                % Calculate intersection area between bounding box i and j
+                intersection_area = rectint(detection(i, 1:4), detection(j, 1:4));
+                
+                % Calculate the area of each bounding box
+                box_i_area = detection(i, 3) * detection(i, 4);
+                box_j_area = detection(j, 3) * detection(j, 4);
+                
+                % Calculate the Intersection over Union (IoU)
+                iou = intersection_area / (box_i_area + box_j_area - intersection_area);
+                
+                % If IoU exceeds the threshold, suppress the box with lower confidence
+                if iou > threshold
+                    if detection(i, 5) > detection(j, 5)
+                        keep(j) = false; % Suppress box j
+                    else
+                        keep(i) = false; % Suppress box i
+                    end
+                end
+            end
+        end
     end
 end
 
-% Function to compute IoU (Intersection over Union)
-function iou = computeIoU(box1, boxes)
-    x1 = box1(1);
-    y1 = box1(2);
-    w1 = box1(3);
-    h1 = box1(4);
+% Keep only the bounding boxes that were not suppressed
+detection = detection(keep, :);
 
-    x2 = boxes(:, 1);
-    y2 = boxes(:, 2);
-    w2 = boxes(:, 3);
-    h2 = boxes(:, 4);
-
-    % Compute the area of intersection
-    x1_inter = max(x1, x2);
-    y1_inter = max(y1, y2);
-    x2_inter = min(x1 + w1, x2 + w2);
-    y2_inter = min(y1 + h1, y2 + h2);
-
-    % Compute the area of intersection (use .* for element-wise multiplication)
-    interArea = max(0, x2_inter - x1_inter) .* max(0, y2_inter - y1_inter);
-    
-    % Compute the area of both boxes
-    area1 = w1 .* h1;  % Use .* for element-wise multiplication
-    area2 = w2 .* h2;  % Use .* for element-wise multiplication
-
-    % Compute IoU
-    unionArea = area1 + area2 - interArea;
-    iou = interArea ./ unionArea;
 end
-
