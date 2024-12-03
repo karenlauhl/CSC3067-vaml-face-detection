@@ -60,15 +60,13 @@ fprintf('Performing %d-Fold Cross-Validation...\n', numFolds);
 %% Cross-validation loop
 for fold = 1:numFolds
     % Get training and test indices
-<<<<<<< HEAD
     trainIdx = training(cv, fold);
     testIdx = test(cv, fold);
     testpca = (testIdx - meanX) * eigenVectors;
    
-=======
+
     trainIdx = setdiff(indices, testIdx);
     testIdx = folds{fold};
->>>>>>> 53c53f82d9263d1698ab4280edbb78804ae812a2
 
     % Split data into training and testing sets
     XTrain = images(trainIdx, :);
