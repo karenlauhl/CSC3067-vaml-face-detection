@@ -150,16 +150,27 @@ False_alarm_rate = 1 - Specificity
 
 % WE NEED TO ADD DETECTOR 
 
+
+%Full image models
+full_modelNN = NNtraining(trainImages, trainLabels);
+full_modelKNN = KNNtraining(trainImages, trainLabels);
+full_modelSVM = SVMtraining(trainImages, trainLabels);
+
+%Hog Feature models
+hog_modelNN = NNtraining(hogtrainMatrix, trainLabels);
+hog_modelKNN = KNNtraining(hogtrainMatrix, trainLabels);
+hog_modelSVM = SVMtraining(hogtrainMatrix, trainLabels);
+
 % Load the image file
 groupImage = {'im1.jpg','im2.jpg'};
 
 
-full_modelNN = NNtraining(trainImages, trainLabels);
-full_modelKNN = KNNtraining(trainImages, trainLabels);
 %Run sliding window face detection
 finalDetections1 = slidingWindow_full_nn(groupImage, full_modelNN);
 finalDetections2 = slidingWindow_full_knn(groupImage, full_modelKNN);
+finalDetections3 = slidingWindow_full_Svm(groupImage, full_modelSVM);
 
-%finalDetections3 = slidingWindow_hog_nn(groupImage, hog_modelNN);
-%finalDetections4 = slidingWindow_hog_knn(groupImage, hog_modelKNN);
+finalDetections4 = slidingWindow_hog_nn(groupImage, hog_modelNN);
+finalDetections5 = slidingWindow_hog_knn(groupImage, hog_modelKNN);
+finalDetections6 = slidingWindow_hog_Svm(groupImage, hog_modelSVM);
 
