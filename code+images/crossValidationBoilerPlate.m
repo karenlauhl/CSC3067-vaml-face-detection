@@ -15,7 +15,6 @@ modelSVM = SVMtraining(Xpca, labels); % change this to SVM, 1-NN, k-NN, RF, or N
 % Number of folds for cross-validation
 numFolds = 5;
 
-
 % Shuffle the data
 numSamples = size(images, 1);
 indices = randperm(numSamples);
