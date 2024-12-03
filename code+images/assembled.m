@@ -5,23 +5,27 @@
 % there is total 670= 45*4 + 49*10 in train as calculated
 [trainImages, trainLabels] = loadFaceImages('face_train.cdataset');   
 [testImages, testLabels] = loadFaceImages('face_test.cdataset');
+% Normalize
+trainImages = double(trainImages);
+testImages = double(testImages);
+trainImages=trainImages/255;
+testImages=testImages/255;
 
-%% HOG
-% Initialize matrix to store HOG features for all training images
+%allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
+%allLabels=[trainLabels; testLabels];  % ; does it vertical.
+
+% Initialize matrix to store HOG features for all TRAINING images
 numImages = size(trainImages, 1); % Number of images in the dataset
 hogtrainMatrix = zeros(numImages, length(hog_feature_vector(reshape(trainImages(1, :), 27, 18)))); % Preallocate
 % Loop through each image in the training set
 for i = 1:numImages
     % Reshape each image from vector to 2D matrix
-    imgt = reshape(trainImages(i, :), [27, 18]);
+    imgt = reshape(trainImages(i, :),27, 18);
     % Extract HOG features for the current image
     hogtrainMatrix(i, :) = hog_feature_vector(imgt); % Store HOG features in the matrix
 end
-
-% Check the size of the HOG matrix (each row corresponds to a feature vector for one image)
-disp(size(hogtrainMatrix));
-
-% Initialize matrix for HOG features of test images
+%===============
+% Initialize matrix for HOG features of TEST images
 numTestImages = size(testImages, 1);
 testHogMatrix = zeros(numTestImages, size(hogtrainMatrix, 2)); % Preallocate
 % Loop through the test images and extract HOG features
@@ -31,17 +35,13 @@ for i = 1:numTestImages
     % Extract HOG features for the test image
     testHogMatrix(i, :) = hog_feature_vector(testImg); % Store HOG features
 end
-disp(size(testHogMatrix));
+%________________________________________________________________________
 
-%allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
-%allLabels=[trainLabels; testLabels];  % ; does it vertical.
-
-%% Apply PCA
+% Apply PCA
 [eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
 
 %% NN Model Training
 modelNN = NNtraining(Xpca, trainLabels);
-
 %% NN Testing
 
 for i=1:size(testImages,1)
@@ -148,55 +148,18 @@ False_alarm_rate = 1 - Specificity
 
 %% Notes
 
-
-
 % WE NEED TO ADD DETECTOR 
 
+% Load the image file
+groupImage = {'im1.jpg','im2.jpg'};
 
 
+full_modelNN = NNtraining(trainImages, trainLabels);
+full_modelKNN = KNNtraining(trainImages, trainLabels);
+%Run sliding window face detection
+finalDetections1 = slidingWindow_full_nn(groupImage, full_modelNN);
+finalDetections2 = slidingWindow_full_knn(groupImage, full_modelKNN);
 
+%finalDetections3 = slidingWindow_hog_nn(groupImage, hog_modelNN);
+%finalDetections4 = slidingWindow_hog_knn(groupImage, hog_modelKNN);
 
-
-
-
-% % Train the classifier
-% model = trainModel(trainImages, trainLabels);
-% 
-% % Evaluate the model on the test set
-% accuracy = evaluateModel(model, testImages, testLabels);
-% 
-% 
-% % Load the image file
-% imageFilePath = 'im3.jpg'; % Replace with your actual image file path
-% groupImage = imread(imageFilePath);
-% 
-% % Define parameters
-% windowSize = [27, 18];
-% stepSize = 7;
-% scales = [1,0.7]; % Example scale levels for the image pyramid   ,0.9, 0.8, 0.7, 0.6
-% iouThreshold=0.1;
-% 
-% %Run sliding window face detection
-% finalDetections = slidingWindowFaceDetection(groupImage, model, windowSize, stepSize, scales,iouThreshold);
-% 
-
-
-
-
-
-% %Without using the gabor feature is 60%
-% % Load training data
-% [trainImages, trainLabels] = loadFaceImages('face_train.cdataset',1);
-% 
-% % Train a KNN classifier
-% Mdl = fitcknn(trainImages, trainLabels, 'NumNeighbors', 3);
-% 
-% % Load test data
-% [testImages, testLabels] = loadFaceImages('face_test.cdataset',1);
-% 
-% % Predict using the trained KNN model
-% predictedLabels = predict(Mdl, testImages);
-% 
-% % Evaluate accuracy
-% accuracy = sum(predictedLabels == testLabels) / numel(testLabels);
-% fprintf('Test Accuracy: %.2f%%\n', accuracy * 100);
