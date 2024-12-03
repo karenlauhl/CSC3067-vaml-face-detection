@@ -35,9 +35,10 @@ disp(size(testHogMatrix));
 %allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
 %allLabels=[trainLabels; testLabels];  % ; does it vertical.
 
+% Apply PCA
+[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
 
 %% NN Model Training
-[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
 modelNN = NNtraining(Xpca, trainLabels);
 %modelNN = NNtraining(hogtrainMatrix, trainLabels);
 
@@ -50,6 +51,7 @@ for i=1:size(testImages,1)
 end
 
 %% Evaluation
+disp('Evaluating NN Model:')
 
 % Finally we compared the predicted classification from our mahcine
 % learning algorithm against the real labelling of the testing image
@@ -57,7 +59,7 @@ comparison = (testLabels==classificationResult);
 
 %Accuracy is the most common metric. It is defiend as the numebr of
 %correctly classified samples/ the total number of tested samples
-AccuracyNN = sum(comparison)/length(comparison)
+Accuracy = sum(comparison)/length(comparison)
 
 % Evaluate accuracy
 % Type 1 and Type 2 error
@@ -75,7 +77,6 @@ Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
 %% KNN Testing 
-[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
 modelKNN = KNNtraining(Xpca, trainLabels);
 
 for i=1:size(testImages,1)
@@ -85,6 +86,7 @@ for i=1:size(testImages,1)
 end
 
 %% Evaluation
+disp('Evaluating KNN Model:')
 
 % Finally we compared the predicted classification from our mahcine
 % learning algorithm against the real labelling of the testing image
@@ -92,7 +94,7 @@ comparison = (testLabels==classificationResult);
 
 %Accuracy is the most common metric. It is defiend as the numebr of
 %correctly classified samples/ the total number of tested samples
-AccuracyKNN = sum(comparison)/length(comparison)
+Accuracy = sum(comparison)/length(comparison)
 
 % Evaluate accuracy
 % Type 1 and Type 2 error
@@ -108,6 +110,42 @@ Specificity = TN / (TN+FP)
 Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
+
+%% SVM Model Training 
+modelSVM = SVMtraining(Xpca, trainLabels);
+
+for i=1:size(testImages,1)
+    testnumber= testHogMatrix(i,:);
+    testpca = (testnumber - meanX) * eigenVectors;
+    classificationResult(i,1) = SVMTesting(testpca, modelSVM);
+end
+
+%% Evaluation
+disp('Evaluating SVM Model:')
+
+% Finally we compared the predicted classification from our mahcine
+% learning algorithm against the real labelling of the testing image
+comparison = (testLabels==classificationResult);
+
+%Accuracy is the most common metric. It is defiend as the numebr of
+%correctly classified samples/ the total number of tested samples
+Accuracy = sum(comparison)/length(comparison)
+
+% Evaluate accuracy
+% Type 1 and Type 2 error
+TP= sum ((testLabels==classificationResult) & (testLabels==1))
+TN= sum ((testLabels==classificationResult) & (testLabels==-1))
+FP= sum ((testLabels~=classificationResult) & (testLabels==-1))
+FN= sum ((testLabels~=classificationResult) & (testLabels==1))
+
+% Metrics
+Precision = TP / (TP+FP)
+Recall = TP / (TP+FN)
+Specificity = TN / (TN+FP)
+Sensitivity = TP / (TP+FN)
+Fmeasure= 2 * TP / (2 * TP+FN+FP)
+False_alarm_rate = 1 - Specificity
+
 
 %% Notes
 
