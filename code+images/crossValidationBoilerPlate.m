@@ -1,12 +1,13 @@
 % Main script for cross-validation with multiple classifiers
-addpath("SVM-KM\")
+addpath("SVM-KM")
 
 % Load all data from all.cdataset
 [images, labels] = loadFaceImages("all.cdataset");
 
-model1NN = NNtraining(images, labels);
-modelKNN = KNNtraining(images, labels);
-modelSVM = SVMtraining(images, labels); % change this to SVM, 1-NN, k-NN, RF, or NN
+[eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(images);
+model1NN = NNtraining(Xpca, labels);
+modelKNN = KNNtraining(Xpca, labels);
+modelSVM = SVMtraining(Xpca, labels); % change this to SVM, 1-NN, k-NN, RF, or NN
 % modelRF = RFtraining(images, labels); 
 % modelNN = NNtraining(images, labels);
 
@@ -36,12 +37,14 @@ for fold = 1:cv.NumTestSets
     % Get training and test indices
     trainIdx = training(cv, fold);
     testIdx = test(cv, fold);
+    testpca = (testIdx - meanX) * eigenVectors;
+   
 
     % Split data into training and testing sets
     XTrain = images(trainIdx, :);
     YTrain = labels(trainIdx);
-    XTest = images(testIdx, :);
-    YTest = labels(testIdx);
+    XTest = images(testpca, :);
+    YTest = labels(testpca);
 
     
     % Train and evaluate 1-NN
