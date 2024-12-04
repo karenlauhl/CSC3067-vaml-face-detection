@@ -1,10 +1,31 @@
 % Main workflow script for face detection
+clear all
+close all
 %% Training
 
 % Load training and test data
 % there is total 670= 45*4 + 49*10 in train as calculated
 [trainImages, trainLabels] = loadFaceImages('face_train.cdataset');   
 [testImages, testLabels] = loadFaceImages('face_test.cdataset');
+
+ogIm = figure
+for i=1:50
+
+    % As you can notice by the size of the matrix image, each digit image
+    % has been transform into a long feature vector to be fed in a machine
+    % learning algorithm.
+    
+    %To visualise or recompose the image again, we need to revert that
+    %process in its 28x28 image format
+    Im = reshape(trainImages(i,:),[27, 18]);
+    if trainLabels(i) == 1
+        isImage = 'Face';
+    else
+        isImage = 'Non-Face';
+    end
+    subplot(5,10,i),colormap gray, imagesc(Im), title(isImage); axis off;
+    
+end
 
 % Initialize matrix to store HOG features for all training images
 numImages = size(trainImages, 1); % Number of images in the dataset
@@ -32,13 +53,64 @@ for i = 1:numTestImages
 end
 disp(size(testHogMatrix));
 
+disp('Models trained')
+
+hog1 = figure
+imnumber=8;
+subplot(1,2,1);
+imagesc(reshape(trainImages(imnumber,:),27,18)); axis off;
+title('Original Image');    
+
+subplot(1,2,2);
+showHog(hogtrainMatrix(imnumber,:),[27, 18]); axis off;
+title('HOG Features');
+
+
+hog2 = figure
+imnumber=30;
+subplot(1,2,1);
+imagesc(reshape(trainImages(imnumber,:),27,18)); axis off;
+title('Original Image');    
+
+subplot(1,2,2);
+showHog(hogtrainMatrix(imnumber,:),[27, 18]); axis off;
+title('HOG Features');
+
+
+hog3 = figure
+imnumber=46;
+subplot(1,2,1);
+imagesc(reshape(trainImages(imnumber,:),27,18)); axis off;
+title('Original Image');    
+
+subplot(1,2,2);
+showHog(hogtrainMatrix(imnumber,:),[27, 18]); axis off;
+title('HOG Features');
+
 %allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
 %allLabels=[trainLabels; testLabels];  % ; does it vertical.
+ 
 
 % Apply PCA
 [eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
 
+%animation for observing the variation of the first eigenvector
+
+eigVector_index=2;
+animation = figure;
+weights = [-3*sqrt(eigenvalues(eigVector_index)): 6*sqrt(eigenvalues(eigVector_index))/200: 3*sqrt(eigenvalues(eigVector_index))];
+for b=weights
+    faceReconstruct = meanX + b*eigenVectors(:,eigVector_index)';
+    if ishandle(animation)  % Check if the figure handle is still valid
+        figure(animation);  
+        showHog(faceReconstruct,[27, 18]);
+        colormap(gray), axis equal, axis off,
+        drawnow
+    end
+end
+
 %% NN Model Training
+
 modelNN = NNtraining(Xpca, trainLabels);
 
 %% NN Testing
@@ -145,17 +217,8 @@ Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
+
 %% Notes
-
-
-
-% WE NEED TO ADD DETECTOR 
-
-
-
-
-
-
 
 
 % % Train the classifier
@@ -178,8 +241,6 @@ False_alarm_rate = 1 - Specificity
 % %Run sliding window face detection
 % finalDetections = slidingWindowFaceDetection(groupImage, model, windowSize, stepSize, scales,iouThreshold);
 % 
-
-
 
 
 
