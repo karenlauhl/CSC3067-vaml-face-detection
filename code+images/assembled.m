@@ -219,7 +219,24 @@ Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
 
+%PCA on hog feature==============================================================================
+% Apply PCA for TRAINING and have to take eigenvalues and from here to testinf ===================
+% Standardize the HOG features
+featureMean = mean(hogtrainMatrix);
+featureStd = std(hogtrainMatrix);
+hogtrainMatrix_scaled = (hogtrainMatrix - featureMean) ./ featureStd;
+
+% Perform PCA on the scaled features
+[eigenVectors, eigenvalues, meanX, hogtrainMatrixPCA] = PrincipalComponentAnalysis(hogtrainMatrix_scaled);
+
+
+
 %% Detector(All combinations) =======================================================================================
+
+%XPCA Models=============================================================================
+pca_modelNN = NNtraining(hogtrainMatrixPCA, trainLabels);
+pca_modelKNN = KNNtraining(hogtrainMatrixPCA, trainLabels);
+pca_modelSVM = SVMtraining(hogtrainMatrixPCA, trainLabels);
 
 %Full image models
 full_modelNN = NNtraining(trainImages, trainLabels);
@@ -243,3 +260,8 @@ finalDetections3 = slidingWindow_full_Svm(groupImage, full_modelSVM);
 finalDetections4 = slidingWindow_hog_nn(groupImage, hog_modelNN);
 finalDetections5 = slidingWindow_hog_knn(groupImage, hog_modelKNN);
 finalDetections6 = slidingWindow_hog_Svm(groupImage, hog_modelSVM);
+
+finalDetections7 = slidingWindow_pca_knn(groupImage, pca_modelKNN,eigenVectors,meanX,featureMean,featureStd);
+finalDetections8 = slidingWindow_pca_nn(groupImage, pca_modelNN,eigenVectors,meanX,featureMean,featureStd);
+finalDetections9 = slidingWindow_pca_svm(groupImage, pca_modelSVM,eigenVectors,meanX,featureMean,featureStd);
+
