@@ -35,7 +35,8 @@ for i=1:50
     
 end
 
-% Initialize matrix to store HOG features for all TRAINING images===============================================
+%HOg Extraction =======================================================
+% Initialize matrix to store HOG features for all TRAINING images=============
 numImages = size(trainImages, 1); % Number of images in the dataset
 hogtrainMatrix = zeros(numImages, length(hog_feature_vector(reshape(trainImages(1, :), 27, 18)))); % Preallocate
 % Loop through each image in the training set
@@ -57,6 +58,16 @@ for i = 1:numTestImages
     testHogMatrix(i, :) = hog_feature_vector(testImg); % Store HOG features
 end
 %=============================================================================================================
+
+%Gabor Extraction =======================================================
+% Number of training samples (assuming you have a list of images and labels)
+numImages = size(trainImages, 1);
+trainGFeatures = zeros(numImages, 19440);  % Assuming 19440 features per sample
+for i = 1:numImages
+     imgt = reshape(trainImages(i, :),27, 18);  % Load your training image
+    trainGFeatures(i, :) = gabor_feature_vector(imgt);  % Extract Gabor feature vector
+end
+%===========================================================================================
 
 disp('Models trained')
 
@@ -230,7 +241,6 @@ hogtrainMatrix_scaled = (hogtrainMatrix - featureMean) ./ featureStd;
 [eigenVectors, eigenvalues, meanX, hogtrainMatrixPCA] = PrincipalComponentAnalysis(hogtrainMatrix_scaled);
 
 
-
 %% Detector(All combinations) =======================================================================================
 
 %XPCA Models=============================================================================
@@ -248,20 +258,29 @@ hog_modelNN = NNtraining(hogtrainMatrix, trainLabels);
 hog_modelKNN = KNNtraining(hogtrainMatrix, trainLabels);
 hog_modelSVM = SVMtraining(hogtrainMatrix, trainLabels);
 
+%Gabor Feature models
+gabor_modelNN = NNtraining(trainGFeatures, trainLabels);
+gabor_modelKNN = KNNtraining(trainGFeatures, trainLabels);
+gabor_modelSVM = SVMtraining(trainGFeatures, trainLabels);
+
 % Load the image file
 groupImage = {'im1.jpg','im2.jpg'};
 
-
 %Run sliding window face detection
-finalDetections1 = slidingWindow_full_nn(groupImage, full_modelNN);
-finalDetections2 = slidingWindow_full_knn(groupImage, full_modelKNN);
-finalDetections3 = slidingWindow_full_Svm(groupImage, full_modelSVM);
+  finalDetections1 = slidingWindow_full_nn(groupImage, full_modelNN);
+  finalDetections2 = slidingWindow_full_knn(groupImage, full_modelKNN);
+  finalDetections3 = slidingWindow_full_Svm(groupImage, full_modelSVM);
+ 
+  finalDetections4 = slidingWindow_hog_nn(groupImage, hog_modelNN);
+  finalDetections5 = slidingWindow_hog_knn(groupImage, hog_modelKNN);
+  finalDetections6 = slidingWindow_hog_Svm(groupImage, hog_modelSVM);
 
-finalDetections4 = slidingWindow_hog_nn(groupImage, hog_modelNN);
-finalDetections5 = slidingWindow_hog_knn(groupImage, hog_modelKNN);
-finalDetections6 = slidingWindow_hog_Svm(groupImage, hog_modelSVM);
+  finalDetections7 = slidingWindow_gabor_nn(groupImage, gabor_modelNN);
+  finalDetections8 = slidingWindow_gabor_knn(groupImage, gabor_modelKNN);
+  finalDetections9 = slidingWindow_gabor_Svm(groupImage, gabor_modelSVM);
 
-finalDetections7 = slidingWindow_pca_knn(groupImage, pca_modelKNN,eigenVectors,meanX,featureMean,featureStd);
-finalDetections8 = slidingWindow_pca_nn(groupImage, pca_modelNN,eigenVectors,meanX,featureMean,featureStd);
-finalDetections9 = slidingWindow_pca_svm(groupImage, pca_modelSVM,eigenVectors,meanX,featureMean,featureStd);
+  finalDetections10 = slidingWindow_pca_knn(groupImage, pca_modelKNN,eigenVectors,meanX,featureMean,featureStd);
+  finalDetections11 = slidingWindow_pca_nn(groupImage, pca_modelNN,eigenVectors,meanX,featureMean,featureStd);
+  finalDetections12 = slidingWindow_pca_svm(groupImage, pca_modelSVM,eigenVectors,meanX,featureMean,featureStd);
+
 
