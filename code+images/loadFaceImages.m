@@ -41,6 +41,14 @@ for im=1:sampling:numberOfImages
     if augmented
         
         if label==1
+
+            %ONe more to enchance
+            enhancedImage = adapthisteq(I, 'Numtiles', [8, 3]);
+            vector = reshape(enhancedImage,1, size(I, 1) * size(I, 2));
+            vector = double(vector); % / 255;
+            images= [images; vector];
+            labels= [labels; label];
+
             Itemp =fliplr(I);
             vector = reshape(Itemp,1, size(I, 1) * size(I, 2));
             vector = double(vector); % / 255;
@@ -96,6 +104,14 @@ for im=1:sampling:numberOfImages
             labels= [labels; label];
             
         else
+
+            %ONe more to enchance
+            enhancedImage = adapthisteq(I, 'Numtiles', [8, 3]);
+            vector = reshape(enhancedImage,1, size(I, 1) * size(I, 2));
+            vector = double(vector); % / 255;
+            images= [images; vector];
+            labels= [labels; label];
+
             Itemp =fliplr(I);
             vector = reshape(Itemp,1, size(I, 1) * size(I, 2));
             vector = double(vector); % / 255;
