@@ -1,12 +1,15 @@
 % Main workflow script for face detection
 clear all
 close all
-%% Training
 
 % Load training and test data
 % there is total 670= 45*4 + 49*10 in train as calculated
 [trainImages, trainLabels] = loadFaceImages('face_train.cdataset');   
 [testImages, testLabels] = loadFaceImages('face_test.cdataset');
+
+%allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
+%allLabels=[trainLabels; testLabels];  % ; does it vertical.
+
 % Normalize
 trainImages = double(trainImages);
 testImages = double(testImages);
@@ -32,7 +35,7 @@ for i=1:50
     
 end
 
-% Initialize matrix to store HOG features for all training images
+% Initialize matrix to store HOG features for all TRAINING images===============================================
 numImages = size(trainImages, 1); % Number of images in the dataset
 hogtrainMatrix = zeros(numImages, length(hog_feature_vector(reshape(trainImages(1, :), 27, 18)))); % Preallocate
 % Loop through each image in the training set
@@ -42,7 +45,7 @@ for i = 1:numImages
     % Extract HOG features for the current image
     hogtrainMatrix(i, :) = hog_feature_vector(imgt); % Store HOG features in the matrix
 end
-%===============
+%==============================================
 % Initialize matrix for HOG features of TEST images
 numTestImages = size(testImages, 1);
 testHogMatrix = zeros(numTestImages, size(hogtrainMatrix, 2)); % Preallocate
@@ -53,8 +56,7 @@ for i = 1:numTestImages
     % Extract HOG features for the test image
     testHogMatrix(i, :) = hog_feature_vector(testImg); % Store HOG features
 end
-
-disp(size(testHogMatrix));
+%=============================================================================================================
 
 disp('Models trained')
 
@@ -90,10 +92,8 @@ subplot(1,2,2);
 showHog(hogtrainMatrix(imnumber,:),[27, 18]); axis off;
 title('HOG Features');
 
-%allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
-%allLabels=[trainLabels; testLabels];  % ; does it vertical.
  
-%% Apply PCA
+%% Apply PCA ================================================================================================
 [eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(hogtrainMatrix);
 
 %animation for observing the variation of the first eigenvector
@@ -111,7 +111,7 @@ for b=weights
     end
 end
 
-%% NN Model Training
+%% NN Model Training With XPCA=============================================================================
 
 modelNN = NNtraining(Xpca, trainLabels);
 %% NN Testing
@@ -148,7 +148,7 @@ Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
-%% KNN Testing 
+%% KNN Testing with XPCA =========================================================================
 modelKNN = KNNtraining(Xpca, trainLabels);
 
 for i=1:size(testImages,1)
@@ -183,7 +183,7 @@ Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
-%% SVM Model Training 
+%% SVM Model Training with XPCA =======================================================================
 modelSVM = SVMtraining(Xpca, trainLabels);
 
 for i=1:size(testImages,1)
@@ -218,7 +218,8 @@ Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
-%% Detector
+
+%% Detector(All combinations) =======================================================================================
 
 %Full image models
 full_modelNN = NNtraining(trainImages, trainLabels);
