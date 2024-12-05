@@ -79,13 +79,12 @@ hogtrainMatrix_scaled = (Hog_train_Matrix - featureMean) ./ featureStd;
 % [GeigenVectors, Geigenvalues, GmeanX, GabortrainMatrixPCA] = PrincipalComponentAnalysis(GtrainMatrix_scaled,100);
 % %=========================================================================================================
 
-ogIm = figure
-for i=1:50
 
-    % As you can notice by the size of the matrix image, each digit image
-    % has been transform into a long feature vector to be fed in a machine
-    % learning algorithm.
-    
+%% XXXXXXXXXXXXXXXXXXXXXXX
+
+ogIm = figure
+
+  for i=1:50
     %To visualise or recompose the image again, we need to revert that
     %process in its 28x28 image format
     Im = reshape(trainImages(i,:),[27, 18]);
@@ -96,7 +95,7 @@ for i=1:50
     end
     subplot(5,10,i),colormap gray, imagesc(Im), title(isImage); axis off;
     
-end
+ end
 
 
 hog1 = figure
@@ -136,7 +135,6 @@ title('HOG Features');
 [eigenVectors, eigenvalues, meanX, Xpca] = PrincipalComponentAnalysis(Hog_train_Matrix);
 
 %animation for observing the variation of the first eigenvector
-
 eigVector_index=2;
 animation = figure;
 weights = [-3*sqrt(eigenvalues(eigVector_index)): 6*sqrt(eigenvalues(eigVector_index))/200: 3*sqrt(eigenvalues(eigVector_index))];
@@ -153,15 +151,14 @@ end
 %% NN Model Training With PCA=============================================================================
 
 modelNN = NNtraining(Xpca, trainLabels);
-%% NN Testing
-
+%NN Testing
 for i=1:size(testImages,1)
     testnumber= Hog_test_Matrix(i,:);
     testpca = (testnumber - meanX) * eigenVectors;
     classificationResult(i,1) = NNTesting(testpca, modelNN);
 end
 
-%% Evaluation
+% Evaluation
 disp('Evaluating NN Model:')
 
 % Finally we compared the predicted classification from our mahcine
@@ -212,7 +209,7 @@ grid on;
 
 modelKNN = KNNtraining(Xpca, trainLabels);
 
-%% KNN Testing with PCA =========================================================================
+% KNN Testing with PCA =========================================================================
 
 for i=1:size(testImages,1)
     testnumber= Hog_test_Matrix(i,:);
@@ -220,7 +217,7 @@ for i=1:size(testImages,1)
     classificationResult(i,1) = KNNTesting(testpca, modelKNN, 2);
 end
 
-%% Evaluation
+% Evaluation
 disp('Evaluating KNN Model:')
 
 % Finally we compared the predicted classification from our mahcine
@@ -269,7 +266,7 @@ grid on;
 %% SVM Model Training With PCA=============================================================================
 
 modelSVM = SVMtraining(Xpca, trainLabels);
-%% SVM Model Testing with PCA =======================================================================
+% SVM Model Testing with PCA =======================================================================
 
 for i=1:size(testImages,1)
     testnumber= Hog_test_Matrix(i,:);
@@ -277,7 +274,7 @@ for i=1:size(testImages,1)
     classificationResult(i,1) = SVMTesting(testpca, modelSVM);
 end
 
-%% Evaluation
+% Evaluation
 disp('Evaluating SVM Model:')
 
 % Finally we compared the predicted classification from our mahcine
