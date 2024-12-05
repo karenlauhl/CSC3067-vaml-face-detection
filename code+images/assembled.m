@@ -69,7 +69,35 @@ for i = 1:numImages
      imgt = reshape(trainImages(i, :),27, 18);  % Load your training image
     trainGFeatures(i, :) = gabor_feature_vector(imgt);  % Extract Gabor feature vector
 end
+% Number of test samples (assuming you have a list of images and labels)
+numImages = size(testImages, 1);
+Gabor_test_Features = zeros(numImages, 19440);  % Assuming 19440 features per sample
+for i = 1:numImages
+     imgt = reshape(testImages(i, :),27, 18);  % Load your training image
+    Gabor_test_Features(i, :) = gabor_feature_vector(imgt);  % Extract Gabor feature vector
+end
 %===========================================================================================
+
+%PCA Extraction feature on hog feature(hogtrainMatrixPCA)=======================================
+% Apply PCA for TRAINING and have to take eigenvalues and from here to testinf ===================
+% Standardize the HOG features
+featureMean = mean(hogtrainMatrix);
+featureStd = std(hogtrainMatrix);
+hogtrainMatrix_scaled = (hogtrainMatrix - featureMean) ./ featureStd;
+
+% Perform PCA on the scaled features
+[eigenVectors, eigenvalues, meanX, hogtrainMatrixPCA] = PrincipalComponentAnalysis(hogtrainMatrix_scaled);
+
+
+% % PCA Extraction on Gabor ===================
+% % Standardize the Gabor features
+% GfeatureMean = mean(trainGFeatures);
+% GfeatureStd = std(trainGFeatures);
+% GtrainMatrix_scaled = (trainGFeatures - GfeatureMean) ./ GfeatureStd;
+% 
+% % Perform PCA on the scaled features
+% [GeigenVectors, Geigenvalues, GmeanX, GabortrainMatrixPCA] = PrincipalComponentAnalysis(trainGFeatures,100);
+% %=========================================================================================================
 
 disp('Models trained')
 
@@ -298,28 +326,7 @@ title('Metrics for SVM');
 grid on;
 hold off
 
-%% Detector
 
-%PCA Extraction feature on hog feature(hogtrainMatrixPCA)==============================================================================
-% Apply PCA for TRAINING and have to take eigenvalues and from here to testinf ===================
-% Standardize the HOG features
-featureMean = mean(hogtrainMatrix);
-featureStd = std(hogtrainMatrix);
-hogtrainMatrix_scaled = (hogtrainMatrix - featureMean) ./ featureStd;
-
-% Perform PCA on the scaled features
-[eigenVectors, eigenvalues, meanX, hogtrainMatrixPCA] = PrincipalComponentAnalysis(hogtrainMatrix_scaled);
-
-
-% % PCA Extraction on Gabor ===================
-% % Standardize the Gabor features
-% GfeatureMean = mean(trainGFeatures);
-% GfeatureStd = std(trainGFeatures);
-% GtrainMatrix_scaled = (trainGFeatures - GfeatureMean) ./ GfeatureStd;
-% 
-% % Perform PCA on the scaled features
-% [GeigenVectors, Geigenvalues, GmeanX, GabortrainMatrixPCA] = PrincipalComponentAnalysis(trainGFeatures,100);
-% %=========================================================================================================
 
 
 %% Detector(All combinations) =======================================================================================
