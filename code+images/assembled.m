@@ -140,6 +140,17 @@ TN= sum ((testLabels==classificationResult) & (testLabels==-1))
 FP= sum ((testLabels~=classificationResult) & (testLabels==-1))
 FN= sum ((testLabels~=classificationResult) & (testLabels==1))
 
+
+% Displaying values in a bar chart
+eval = [TP, TN, FP, FN];
+evalNN = figure;
+bar(eval);
+set(gca, 'XTickLabel', {'TP', 'TN', 'FP', 'FN'});
+xlabel('Classification');
+ylabel('Value');
+title('Type 1 and Type 2 Error for NN');
+grid on;
+
 % Metrics
 Precision = TP / (TP+FP)
 Recall = TP / (TP+FN)
@@ -148,13 +159,23 @@ Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
+% Displaying values in a bar chart
+eval = [Precision, Recall, Specificity, Sensitivity, Fmeasure, False_alarm_rate];
+metricsNN = figure;
+bar(eval);
+set(gca, 'XTickLabel', {'Precision', 'Recall', 'Specificity', 'Sensitivity', 'Fmeasure', 'False Alarm Rate'});
+xlabel('Classification');
+ylabel('Value');
+title('Metrics for NN');
+grid on;
+
 %% KNN Testing 
 modelKNN = KNNtraining(Xpca, trainLabels);
 
 for i=1:size(testImages,1)
     testnumber= testHogMatrix(i,:);
     testpca = (testnumber - meanX) * eigenVectors;
-    classificationResult(i,1) = KNNTesting(testpca, modelKNN,11);
+    classificationResult(i,1) = KNNTesting(testpca, modelKNN, 2);
 end
 
 %% Evaluation
@@ -175,6 +196,16 @@ TN= sum ((testLabels==classificationResult) & (testLabels==-1))
 FP= sum ((testLabels~=classificationResult) & (testLabels==-1))
 FN= sum ((testLabels~=classificationResult) & (testLabels==1))
 
+% Displaying values in a bar chart
+eval = [TP, TN, FP, FN];
+evalKNN = figure;
+bar(eval);
+set(gca, 'XTickLabel', {'TP', 'TN', 'FP', 'FN'});
+xlabel('Classification');
+ylabel('Value');
+title('Type 1 and Type 2 Error for KNN');
+grid on;
+
 % Metrics
 Precision = TP / (TP+FP)
 Recall = TP / (TP+FN)
@@ -182,6 +213,16 @@ Specificity = TN / (TN+FP)
 Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
+
+% Displaying values in a bar chart
+eval = [Precision, Recall, Specificity, Sensitivity, Fmeasure, False_alarm_rate];
+metricsKNN = figure;
+bar(eval);
+set(gca, 'XTickLabel', {'Precision', 'Recall', 'Specificity', 'Sensitivity', 'Fmeasure', 'False Alarm Rate'});
+xlabel('Classification');
+ylabel('Value');
+title('Metrics for KNN');
+grid on;
 
 %% SVM Model Training 
 modelSVM = SVMtraining(Xpca, trainLabels);
@@ -210,6 +251,16 @@ TN= sum ((testLabels==classificationResult) & (testLabels==-1))
 FP= sum ((testLabels~=classificationResult) & (testLabels==-1))
 FN= sum ((testLabels~=classificationResult) & (testLabels==1))
 
+% Displaying values in a bar chart
+eval = [TP, TN, FP, FN];
+evalSVM = figure;
+bar(eval);
+set(gca, 'XTickLabel', {'TP', 'TN', 'FP', 'FN'});
+xlabel('Classification');
+ylabel('Value');
+title('Type 1 and Type 2 Error for SVM');
+grid on;
+
 % Metrics
 Precision = TP / (TP+FP)
 Recall = TP / (TP+FN)
@@ -217,6 +268,17 @@ Specificity = TN / (TN+FP)
 Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
+
+% Displaying values in a bar chart
+eval = [Precision, Recall, Specificity, Sensitivity, Fmeasure, False_alarm_rate];
+metricsSVM = figure;
+bar(eval);
+set(gca, 'XTickLabel', {'Precision', 'Recall', 'Specificity', 'Sensitivity', 'Fmeasure', 'False Alarm Rate'});
+xlabel('Classification');
+ylabel('Value');
+title('Metrics for SVM');
+grid on;
+hold off
 
 %% Detector
 
@@ -231,8 +293,7 @@ hog_modelKNN = KNNtraining(hogtrainMatrix, trainLabels);
 hog_modelSVM = SVMtraining(hogtrainMatrix, trainLabels);
 
 % Load the image file
-groupImage = {'im1.jpg','im2.jpg'};
-
+groupImage = {'im1.jpg','im2.jpg','im3.jpg','im4.jpg'};
 
 %Run sliding window face detection
 finalDetections1 = slidingWindow_full_nn(groupImage, full_modelNN);

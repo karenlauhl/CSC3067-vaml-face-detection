@@ -61,4 +61,5 @@ function [detections, outputImage] = slidingWindowFaceDetection(image, model, wi
 
     % Print the total number of detections
     fprintf('Total number of detections: %d\n', size(detections, 1));
+    
 end

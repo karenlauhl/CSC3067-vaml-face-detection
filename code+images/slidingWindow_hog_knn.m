@@ -38,7 +38,7 @@ function [detections] = slidingWindow_hog_knn(fullImageFiles, model)
                 hogFeatures = hog_feature_vector(window_mat);
 
                 % Use KNN to classify the extracted features
-                predictedLabel = KNNTesting(hogFeatures, model,11);
+                predictedLabel = KNNTesting(hogFeatures, model,2);
                 
                 % If a face is detected (predictedLabel == 1), store the detection
                 if predictedLabel == 1

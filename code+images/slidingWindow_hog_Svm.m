@@ -37,7 +37,7 @@ function [detections] = slidingWindow_hog_Svm(fullImageFiles, model)
                 % Extract HOG features
                 hogFeatures = hog_feature_vector(window_mat);
 
-                % Use KNN to classify the extracted features
+                % Use SVM to classify the extracted features
                 predictedLabel = SVMTesting(hogFeatures, model);
                 
                 % If a face is detected (predictedLabel == 1), store the detection
@@ -70,7 +70,8 @@ function [detections] = slidingWindow_hog_Svm(fullImageFiles, model)
 
     % Print the total number of detections after NMS
     fprintf('Total number of detections: %d\n', size(detections, 1));
+
+    
  end
-
-
+ 
 end
