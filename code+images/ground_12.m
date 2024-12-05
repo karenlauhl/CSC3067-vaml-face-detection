@@ -112,7 +112,7 @@ imageToGroundTruthMap = {
 
 
 % Parameters
-iouThreshold = 0.5; % IoU threshold for determining a match
+iouThreshold = 0.3; % IoU threshold for determining a match
 outputDir = 'output_images';
 if ~exist(outputDir, 'dir')
     mkdir(outputDir);
