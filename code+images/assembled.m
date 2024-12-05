@@ -18,25 +18,6 @@ testImages = double(testImages);
 trainImages=trainImages/255;
 testImages=testImages/255;
 
-ogIm = figure
-for i=1:50
-
-    % As you can notice by the size of the matrix image, each digit image
-    % has been transform into a long feature vector to be fed in a machine
-    % learning algorithm.
-    
-    %To visualise or recompose the image again, we need to revert that
-    %process in its 28x28 image format
-    Im = reshape(trainImages(i,:),[27, 18]);
-    if trainLabels(i) == 1
-        isImage = 'Face';
-    else
-        isImage = 'Non-Face';
-    end
-    subplot(5,10,i),colormap gray, imagesc(Im), title(isImage); axis off;
-    
-end
-
 %HOg Extraction =======================================================
 % Initialize matrix to store HOG features for all TRAINING images=============
 numImages = size(trainImages, 1); % Number of images in the dataset
@@ -98,7 +79,25 @@ hogtrainMatrix_scaled = (Hog_train_Matrix - featureMean) ./ featureStd;
 % [GeigenVectors, Geigenvalues, GmeanX, GabortrainMatrixPCA] = PrincipalComponentAnalysis(GtrainMatrix_scaled,100);
 % %=========================================================================================================
 
-disp('Models trained')
+ogIm = figure
+for i=1:50
+
+    % As you can notice by the size of the matrix image, each digit image
+    % has been transform into a long feature vector to be fed in a machine
+    % learning algorithm.
+    
+    %To visualise or recompose the image again, we need to revert that
+    %process in its 28x28 image format
+    Im = reshape(trainImages(i,:),[27, 18]);
+    if trainLabels(i) == 1
+        isImage = 'Face';
+    else
+        isImage = 'Non-Face';
+    end
+    subplot(5,10,i),colormap gray, imagesc(Im), title(isImage); axis off;
+    
+end
+
 
 hog1 = figure
 imnumber=8;
@@ -330,6 +329,7 @@ hold off
 
 %% Detector(All combinations) =======================================================================================
 
+disp('Models training')
 %PCA on Hog Models
 pca_modelNN = NNtraining(hogtrainMatrixPCA, trainLabels);
 pca_modelKNN = KNNtraining(hogtrainMatrixPCA, trainLabels);
