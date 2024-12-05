@@ -1,4 +1,5 @@
 clear; clc; close all;  % Clear workspace, command window, and close figures
+addpath("SVM-KM\")
 
 % Main workflow script for face detection using SVM and evaluation with face_test.cdataset
 
@@ -13,7 +14,7 @@ stepSize = 7;
 scales = [1, 0.9, 0.8, 0.7];
 iouThreshold = 0.3;
 
-fullImageFiles = {'im1.jpg'};
+fullImageFiles = {'im1.jpg', 'im2.jpg', 'im3.jpg', 'im4.jpg'};
 
 %% Detection Loop (Optional: For visualizing detections)
 for imgIndex = 1:length(fullImageFiles)
@@ -93,3 +94,23 @@ disp(['F-measure: ', num2str(Fmeasure)]);
 disp(['Specificity: ', num2str(Specificity)]);
 disp(['False Alarm Rate: ', num2str(False_alarm_rate)]);
 disp('Face detection complete.');
+%% Plot Confusion Matrix Elements
+figure;
+categories = {'TP', 'TN', 'FP', 'FN'};
+values = [TP, TN, FP, FN];
+bar(values);
+set(gca, 'XTickLabel', categories);
+title('Type 1 and Type 2 Error for SVM');
+ylabel('Value');
+xlabel('Classification');
+
+%% Plot Metrics
+figure;
+metrics = {'Precision', 'Recall', 'Specificity', 'Sensitivity', 'F-measure', 'False Alarm Rate'};
+metric_values = [Precision, Recall, Specificity, Recall, Fmeasure, False_alarm_rate];
+bar(metric_values);
+set(gca, 'XTickLabel', metrics);
+title('Metrics for SVM');
+ylabel('Value');
+xlabel('Classification');
+ylim([0, 1]); % Since metrics are typically in the range [0, 1]
