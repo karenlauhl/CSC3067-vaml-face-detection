@@ -9,7 +9,7 @@ addpath("SVM-KM\")
 [trainImages, trainLabels] = loadFaceImages('face_train.cdataset');   
 [testImages, testLabels] = loadFaceImages('face_test.cdataset');
 
-%allImages=[trainImages; testImages];  % , Concatenation horin and ; does it vertical.
+%allImages=[trainImages; testImages];  % , Concatenation horin and
 %allLabels=[trainLabels; testLabels];  % ; does it vertical.
 
 % Normalize
@@ -18,10 +18,10 @@ testImages = double(testImages);
 trainImages=trainImages/255;
 testImages=testImages/255;
 
-%HOg Extraction =======================================================
+%Hog Extraction =======================================================
 % Initialize matrix to store HOG features for all TRAINING images=============
 numImages = size(trainImages, 1); % Number of images in the dataset
-Hog_train_Matrix = zeros(numImages, length(hog_feature_vector(reshape(trainImages(1, :), 27, 18)))); % Preallocate
+Hog_train_Matrix = zeros(numImages, length(hog_feature_vector(reshape(trainImages(1, :), 27, 18))));
 % Loop through each image in the training set
 for i = 1:numImages
     % Reshape each image from vector to 2D matrix
@@ -32,35 +32,35 @@ end
 %==============================================
 % Initialize matrix for HOG features of TEST images
 numTestImages = size(testImages, 1);
-Hog_test_Matrix = zeros(numTestImages, size(Hog_train_Matrix, 2)); % Preallocate
+Hog_test_Matrix = zeros(numTestImages, size(Hog_train_Matrix, 2)); 
 % Loop through the test images and extract HOG features
 for i = 1:numTestImages
     % Reshape the test image to 2D
     testImg = reshape(testImages(i, :), [27, 18]);
     % Extract HOG features for the test image
-    Hog_test_Matrix(i, :) = hog_feature_vector(testImg); % Store HOG features
+    Hog_test_Matrix(i, :) = hog_feature_vector(testImg); % Store HOG features in the matrix
 end
 %=============================================================================================================
 
 %Gabor Extraction =======================================================
-% Number of training samples (assuming you have a list of images and labels)
+% Number of training samples
 numImages = size(trainImages, 1);
-Gabor_train_Features = zeros(numImages, 19440);  % Assuming 19440 features per sample
+Gabor_train_Features = zeros(numImages, 19440);  % 19440 features per img
 for i = 1:numImages
      imgt = reshape(trainImages(i, :),27, 18);  % Load your training image
     Gabor_train_Features(i, :) = gabor_feature_vector(imgt);  % Extract Gabor feature vector
 end
-% Number of test samples (assuming you have a list of images and labels)
+% Number of test samples 
 numImages = size(testImages, 1);
-Gabor_test_Features = zeros(numImages, 19440);  % Assuming 19440 features per sample
+Gabor_test_Features = zeros(numImages, 19440);  % 19440 features per img
 for i = 1:numImages
-     imgt = reshape(testImages(i, :),27, 18);  % Load your training image
+     imgt = reshape(testImages(i, :),27, 18);  % Load your test image
     Gabor_test_Features(i, :) = gabor_feature_vector(imgt);  % Extract Gabor feature vector
 end
 %===========================================================================================
 
-%PCA Extraction feature on hog feature(hogtrainMatrixPCA)=======================================
-% Apply PCA for TRAINING and have to take eigenvalues and from here to testinf ===================
+%PCA Extraction feature on hog feature=(hogtrainMatrix_scaled)=======================================
+% Apply PCA for TRAINING  ===================
 % Standardize the HOG features
 featureMean = mean(Hog_train_Matrix);
 featureStd = std(Hog_train_Matrix);
@@ -69,7 +69,7 @@ hogtrainMatrix_scaled = (Hog_train_Matrix - featureMean) ./ featureStd;
 % Perform PCA on the scaled features
 [eigenVectors, eigenvalues, meanX, hogtrainMatrixPCA] = PrincipalComponentAnalysis(hogtrainMatrix_scaled);
 
-% % PCA Extraction on Gabor ===================
+% % PCA Extraction on Gabor=(GtrainMatrix_scaled) ===================
 % % Standardize the Gabor features
 % GfeatureMean = mean(Gabor_train_Features);
 % GfeatureStd = std(Gabor_train_Features);
