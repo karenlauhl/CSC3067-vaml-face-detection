@@ -2,6 +2,8 @@
 clear all
 close all
 
+addpath("SVM-KM\")
+
 % Load training and test data
 % there is total 670= 45*4 + 49*10 in train as calculated
 [trainImages, trainLabels] = loadFaceImages('face_train.cdataset');   
