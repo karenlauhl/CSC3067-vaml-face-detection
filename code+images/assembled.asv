@@ -122,7 +122,7 @@ for b=weights
     end
 end
 
-%% NN Model Training With XPCA=============================================================================
+%% NN Model Training With PCA=============================================================================
 
 modelNN = NNtraining(Xpca, trainLabels);
 %% NN Testing
@@ -170,7 +170,6 @@ Sensitivity = TP / (TP+FN)
 Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
-<<<<<<< HEAD
 % Displaying values in a bar chart
 eval = [Precision, Recall, Specificity, Sensitivity, Fmeasure, False_alarm_rate];
 metricsNN = figure;
@@ -317,24 +316,24 @@ hogtrainMatrix_scaled = (hogtrainMatrix - featureMean) ./ featureStd;
 %% Detector(All combinations) =======================================================================================
 
 %PCA on Hog Models
-pca_modelNN = NNtraining(hogtrainMatrixPCA, trainLabels);
-pca_modelKNN = KNNtraining(hogtrainMatrixPCA, trainLabels);
+%pca_modelNN = NNtraining(hogtrainMatrixPCA, trainLabels);
+%pca_modelKNN = KNNtraining(hogtrainMatrixPCA, trainLabels);
 pca_modelSVM = SVMtraining(hogtrainMatrixPCA, trainLabels);
 
 %Full image models
-full_modelNN = NNtraining(trainImages, trainLabels);
-full_modelKNN = KNNtraining(trainImages, trainLabels);
-full_modelSVM = SVMtraining(trainImages, trainLabels);
+%full_modelNN = NNtraining(trainImages, trainLabels);
+%full_modelKNN = KNNtraining(trainImages, trainLabels);
+%full_modelSVM = SVMtraining(trainImages, trainLabels);
 
 %Hog Feature models
-hog_modelNN = NNtraining(hogtrainMatrix, trainLabels);
-hog_modelKNN = KNNtraining(hogtrainMatrix, trainLabels);
-hog_modelSVM = SVMtraining(hogtrainMatrix, trainLabels);
+%hog_modelNN = NNtraining(hogtrainMatrix, trainLabels);
+%hog_modelKNN = KNNtraining(hogtrainMatrix, trainLabels);
+%hog_modelSVM = SVMtraining(hogtrainMatrix, trainLabels);
 
 %Gabor Feature models
-gabor_modelNN = NNtraining(trainGFeatures, trainLabels);
-gabor_modelKNN = KNNtraining(trainGFeatures, trainLabels);
-gabor_modelSVM = SVMtraining(trainGFeatures, trainLabels);
+%gabor_modelNN = NNtraining(trainGFeatures, trainLabels);
+%gabor_modelKNN = KNNtraining(trainGFeatures, trainLabels);
+%gabor_modelSVM = SVMtraining(trainGFeatures, trainLabels);
 
 %PCA with gabor Models
 % Gpca_modelNN = NNtraining(GabortrainMatrixPCA, trainLabels);
