@@ -230,7 +230,7 @@ Fmeasure= 2 * TP / (2 * TP+FN+FP)
 False_alarm_rate = 1 - Specificity
 
 
-%PCA on hog feature==============================================================================
+%PCA Extraction feature on hog feature(hogtrainMatrixPCA)==============================================================================
 % Apply PCA for TRAINING and have to take eigenvalues and from here to testinf ===================
 % Standardize the HOG features
 featureMean = mean(hogtrainMatrix);
@@ -241,9 +241,20 @@ hogtrainMatrix_scaled = (hogtrainMatrix - featureMean) ./ featureStd;
 [eigenVectors, eigenvalues, meanX, hogtrainMatrixPCA] = PrincipalComponentAnalysis(hogtrainMatrix_scaled);
 
 
+% % PCA Extraction on Gabor ===================
+% % Standardize the Gabor features
+% GfeatureMean = mean(trainGFeatures);
+% GfeatureStd = std(trainGFeatures);
+% GtrainMatrix_scaled = (trainGFeatures - GfeatureMean) ./ GfeatureStd;
+% 
+% % Perform PCA on the scaled features
+% [GeigenVectors, Geigenvalues, GmeanX, GabortrainMatrixPCA] = PrincipalComponentAnalysis(trainGFeatures,100);
+% %=========================================================================================================
+
+
 %% Detector(All combinations) =======================================================================================
 
-%XPCA Models=============================================================================
+%PCA on Hog Models
 pca_modelNN = NNtraining(hogtrainMatrixPCA, trainLabels);
 pca_modelKNN = KNNtraining(hogtrainMatrixPCA, trainLabels);
 pca_modelSVM = SVMtraining(hogtrainMatrixPCA, trainLabels);
@@ -262,6 +273,12 @@ hog_modelSVM = SVMtraining(hogtrainMatrix, trainLabels);
 gabor_modelNN = NNtraining(trainGFeatures, trainLabels);
 gabor_modelKNN = KNNtraining(trainGFeatures, trainLabels);
 gabor_modelSVM = SVMtraining(trainGFeatures, trainLabels);
+
+%XPCA with gabor Models
+% Gpca_modelNN = NNtraining(GabortrainMatrixPCA, trainLabels);
+% Gpca_modelKNN = KNNtraining(GabortrainMatrixPCA, trainLabels);
+% Gpca_modelSVM = SVMtraining(GabortrainMatrixPCA, trainLabels);
+disp('Models trained')
 
 % Load the image file
 groupImage = {'im1.jpg','im2.jpg'};
@@ -282,5 +299,9 @@ groupImage = {'im1.jpg','im2.jpg'};
   finalDetections10 = slidingWindow_pca_knn(groupImage, pca_modelKNN,eigenVectors,meanX,featureMean,featureStd);
   finalDetections11 = slidingWindow_pca_nn(groupImage, pca_modelNN,eigenVectors,meanX,featureMean,featureStd);
   finalDetections12 = slidingWindow_pca_svm(groupImage, pca_modelSVM,eigenVectors,meanX,featureMean,featureStd);
+
+   % finalDetections13 = slidingWindow_gabor_pca_knn(groupImage, Gpca_modelKNN,GeigenVectors,GmeanX,GfeatureMean,GfeatureStd);
+   % finalDetections14 = slidingWindow_gabor_pca_nn(groupImage, Gpca_modelNN,GeigenVectors,GmeanX,GfeatureMean,GfeatureStd);
+   % finalDetections15 = slidingWindow_gabor_pca_svm(groupImage, Gpca_modelSVM,GeigenVectors,GmeanX,GfeatureMean,GfeatureStd);
 
 
