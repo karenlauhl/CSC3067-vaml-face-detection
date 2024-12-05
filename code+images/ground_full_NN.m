@@ -219,11 +219,6 @@ disp(['Precision: ', num2str(precision)]);
 disp(['Recall: ', num2str(recall)]);
 disp(['F-measure: ', num2str(fmeasure)]);
 
-% Reflection
-disp('Reflection:');
-disp('1. Low contrast or occluded faces can lead to false negatives.');
-disp('2. Busy or cluttered backgrounds may cause false positives.');
-disp('3. Faces at extreme scales or unusual poses can be missed.');
 
 disp('Detection and evaluation complete.');
 
